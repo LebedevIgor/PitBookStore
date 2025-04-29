@@ -18,7 +18,18 @@ const sequelize = new Sequelize('bookstore', 'root', '', {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    if (error.original && error.original.code === 'ER_BAD_DB_ERROR') {
+      // Если база данных не существует, создаем её
+      const tempSequelize = new Sequelize('', 'root', '', {
+        host: 'localhost',
+        dialect: 'mysql',
+      });
+      await tempSequelize.query(`CREATE DATABASE bookstore;`);
+      console.log('Database "bookstore" created successfully.');
+      await sequelize.authenticate(); // Повторная попытка подключения
+    } else {
+      console.error('Unable to connect to the database:', error);
+    }
   }
 })();
 
@@ -212,7 +223,7 @@ app.get('/search/books', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
