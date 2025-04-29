@@ -1,0 +1,77 @@
+-- Создаем базу данных (если еще не создана)
+CREATE DATABASE IF NOT EXISTS bookstore;
+USE bookstore;
+
+-- Таблица жанров
+CREATE TABLE IF NOT EXISTS Genres (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Таблица стеллажей
+CREATE TABLE IF NOT EXISTS Shelves (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  number INT NOT NULL UNIQUE,
+  location VARCHAR(100) NOT NULL,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Таблица книг
+CREATE TABLE IF NOT EXISTS Books (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  author VARCHAR(100) NOT NULL,
+  publisher VARCHAR(100) NOT NULL,
+  year INT,
+  price DECIMAL(10,2) NOT NULL,
+  quantity INT DEFAULT 1,
+  GenreId INT,
+  ShelfId INT,
+  createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (GenreId) REFERENCES Genres(id),
+  FOREIGN KEY (ShelfId) REFERENCES Shelves(id)
+);
+
+-- Заполняем жанры (явно указываем createdAt и updatedAt)
+INSERT INTO Genres (name, createdAt, updatedAt) VALUES
+('Фантастика', NOW(), NOW()),
+('Детектив', NOW(), NOW()),
+('Роман', NOW(), NOW()),
+('Фэнтези', NOW(), NOW()),
+('Научная литература', NOW(), NOW()),
+('Биография', NOW(), NOW()),
+('Поэзия', NOW(), NOW()),
+('Учебная литература', NOW(), NOW());
+
+-- Заполняем стеллажи (явно указываем createdAt и updatedAt)
+INSERT INTO Shelves (number, location, createdAt, updatedAt) VALUES
+(1, 'Левая стена - верхний ряд', NOW(), NOW()),
+(2, 'Левая стена - средний ряд', NOW(), NOW()),
+(3, 'Левая стена - нижний ряд', NOW(), NOW()),
+(4, 'Правая стена - верхний ряд', NOW(), NOW()),
+(5, 'Правая стена - средний ряд', NOW(), NOW()),
+(6, 'Центральный стеллаж - секция A', NOW(), NOW()),
+(7, 'Центральный стеллаж - секция B', NOW(), NOW()),
+(8, 'Возле кассы', NOW(), NOW());
+
+-- Заполняем книги (явно указываем createdAt и updatedAt)
+INSERT INTO Books (title, author, publisher, year, price, quantity, GenreId, ShelfId, createdAt, updatedAt) VALUES
+('Мастер и Маргарита', 'Михаил Булгаков', 'АСТ', 1967, 450.00, 5, 1, 2, NOW(), NOW()),
+('Преступление и наказание', 'Федор Достоевский', 'Эксмо', 1866, 380.50, 3, 3, 2, NOW(), NOW()),
+('1984', 'Джордж Оруэлл', 'Азбука', 1949, 520.00, 7, 1, 4, NOW(), NOW()),
+('Гарри Поттер и философский камень', 'Дж. К. Роулинг', 'Росмэн', 1997, 699.99, 12, 4, 6, NOW(), NOW()),
+('Убийство в Восточном экспрессе', 'Агата Кристи', 'Эксмо', 1934, 420.00, 4, 2, 3, NOW(), NOW()),
+('Краткая история времени', 'Стивен Хокинг', 'АСТ', 1988, 650.00, 2, 5, 5, NOW(), NOW()),
+('Властелин колец: Братство кольца', 'Дж. Р. Р. Толкин', 'Азбука', 1954, 750.00, 6, 4, 6, NOW(), NOW()),
+('Шерлок Холмс: Собака Баскервилей', 'Артур Конан Дойл', 'Эксмо', 1902, 390.00, 5, 2, 3, NOW(), NOW()),
+('Анна Каренина', 'Лев Толстой', 'АСТ', 1877, 430.00, 4, 3, 2, NOW(), NOW()),
+('Игра престолов', 'Джордж Мартин', 'Азбука', 1996, 680.00, 8, 4, 6, NOW(), NOW()),
+('Физика будущего', 'Митио Каку', 'Альпина нон-фикшн', 2011, 720.00, 3, 5, 5, NOW(), NOW()),
+('Стихотворения', 'Анна Ахматова', 'Эксмо', 2020, 350.00, 6, 7, 1, NOW(), NOW()),
+('JavaScript: Полное руководство', 'Дэвид Флэнаган', 'Диалектика', 2020, 1450.00, 9, 8, 8, NOW(), NOW()),
+('Python для детей', 'Джейсон Бриггс', 'Питер', 2019, 890.00, 5, 8, 8, NOW(), NOW()),
+('Стив Джобс', 'Уолтер Айзексон', 'АСТ', 2011, 850.00, 4, 6, 5, NOW(), NOW());
