@@ -8,17 +8,23 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Получаем хост базы данных из переменной окружения или используем значение по умолчанию
+const DB_HOST = process.env.DB_HOST || 'localhost';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
+const DB_NAME = process.env.DB_NAME || 'bookstore';
+
 // Функция для создания базы данных, если она не существует
 async function ensureDatabaseExists() {
   const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
   });
 
   try {
-    await connection.query('CREATE DATABASE IF NOT EXISTS bookstore');
-    console.log('База данных "bookstore" создана или уже существует');
+    await connection.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME}`);
+    console.log(`База данных "${DB_NAME}" создана или уже существует`);
   } catch (error) {
     console.error('Ошибка при создании базы данных:', error);
   } finally {
@@ -32,9 +38,14 @@ async function startApp() {
   await ensureDatabaseExists();
 
   // Подключаемся к базе данных через Sequelize
-  const sequelize = new Sequelize('bookstore', 'root', '', {
-    host: 'localhost',
+  const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
     dialect: 'mysql',
+    retry: {
+      max: 5,
+      backoffBase: 1000,
+      backoffExponent: 1.1,
+    },
   });
 
   try {
@@ -235,7 +246,7 @@ async function startApp() {
     }
   });
   // Запуск сервера
-  const PORT = process.env.PORT || 3005;
+  const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
   });

@@ -8,11 +8,17 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=bookstore
+      - PORT=3000
     volumes:
       - .:/app
       - /app/node_modules
     depends_on:
       - mysql
+    restart: always
 
   mysql:
     image: mysql:8.0
@@ -25,6 +31,7 @@ services:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+    restart: always
 
 volumes:
   mysql_data:
